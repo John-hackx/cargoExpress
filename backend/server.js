@@ -12,7 +12,13 @@ const allowedOrigins = [
   "https://cargo-express-two.vercel.app/",
   "http://localhost:5173",
 ];
-app.use(cors({ origin: allowedOrigins, credentials: true }));
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
