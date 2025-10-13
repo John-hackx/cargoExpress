@@ -9,7 +9,7 @@ export const trackShipment = async (req, res) => {
     if (!shipment) {
       return res.status(404).json({
         success: false,
-        message:
+        error:
           "Shipment not found. Please check your tracking number and try again.",
       });
     }
@@ -21,6 +21,11 @@ export const trackShipment = async (req, res) => {
       origin: {
         city: shipment.origin?.city,
         country: shipment.origin?.country,
+      },
+      productDetails: {
+        name: shipment.productDetails.name,
+        quantity: shipment.productDetails.quantity,
+        weight: shipment.productDetails.weight,
       },
       destination: {
         city: shipment.destination?.city,

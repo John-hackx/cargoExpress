@@ -6,26 +6,31 @@ export const sampleShipments = [
     trackingNumber: "ST12345",
     status: "delivered",
     origin: {
-      address: "123 Factory Street",
-      city: "Shanghai",
-      country: "China",
-      coordinates: { lat: 31.2304, lng: 121.4737 },
-    },
-    destination: {
-      address: "456 Customer Avenue",
+      address: "Accra Ghana",
       city: "Accra",
       country: "Ghana",
+      coordinates: { lat: 31.2304, lng: 121.4737 },
+    },
+    productDetails: {
+      name: "Gold Bars",
+      quantity: 182,
+      weight: 294,
+    },
+    destination: {
+      address: "85100 Potenza (Italia)",
+      city: "Viena",
+      country: "Italy",
       coordinates: { lat: 5.6037, lng: -0.187 },
     },
     sender: {
-      name: "Global Electronics Ltd",
-      email: "sales@globalelectronics.com",
-      phone: "+86-21-1234-5678",
+      name: "Sarah Quaye",
+      email: "quayesarah75@gmail.com",
+      phone: "+233-596-881-057",
     },
     recipient: {
-      name: "John Mensah",
-      email: "john.mensah@email.com",
-      phone: "+233-24-123-4567",
+      name: "Antonio Bonicore",
+      email: "antoniobonicore@gmail.com",
+      phone: "+39-329-6358-722",
     },
     packageDetails: {
       weight: 5.5,
@@ -58,21 +63,21 @@ export const sampleShipments = [
       },
       {
         status: "Arrived at Local Hub",
-        location: "Tema, Ghana",
+        location: "London, UK",
         time: new Date("2025-10-10T18:20:00"),
         icon: "package",
         description: "Package arrived at local distribution center",
       },
       {
         status: "In Transit",
-        location: "Guangzhou, China",
+        location: "Frankfurt, Germany",
         time: new Date("2025-10-08T09:00:00"),
         icon: "plane",
         description: "Package on international flight",
       },
       {
         status: "Shipment Created",
-        location: "Shanghai, China",
+        location: "Rome, Italy",
         time: new Date("2025-10-06T12:15:00"),
         icon: "package",
         description: "Shipment created and picked up from sender",
@@ -150,6 +155,7 @@ export const sampleShipments = [
       country: "UAE",
       coordinates: { lat: 25.2048, lng: 55.2708 },
     },
+
     destination: {
       address: "777 Residential Area",
       city: "Nairobi",

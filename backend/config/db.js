@@ -7,6 +7,9 @@ import shipmentModel from "../models/shipmentModel.js";
 // Add to server.js
 const checkAndSeed = async () => {
   try {
+    // Clear existing data
+    await shipmentModel.deleteMany({});
+    console.log("🗑️  Cleared existing shipments");
     const count = await shipmentModel.countDocuments();
 
     if (count === 0) {

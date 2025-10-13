@@ -55,6 +55,11 @@ const shipmentSchema = new mongoose.Schema(
         lng: Number,
       },
     },
+    productDetails: {
+      name: String,
+      quantity: Number,
+      weight: Number,
+    },
     destination: {
       address: String,
       city: String,

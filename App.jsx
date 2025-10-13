@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { API_URL } from "./api/api";
 import {
   Package,
@@ -216,9 +216,6 @@ const TrackingPage = ({
   setTrackingNumber,
   shipmentData,
   onTrack,
-  error,
-  setError,
-  setShipmentData,
 }) => {
   const handleInputChange = (e) => {
     setTrackingNumber(e.target.value);
@@ -230,27 +227,10 @@ const TrackingPage = ({
     }
   };
 
-  useEffect(() => {
-    setError(null);
-    setShipmentData(null);
-    setTrackingNumber("");
-  }, []);
-
   return (
     <>
       <section className="tracking-input-section">
         <div className="container">
-          {error && (
-            <section className="error-section">
-              <div className="container">
-                <div className="error-card">
-                  <Package size={48} />
-                  <h3>Tracking number not found!!!</h3>
-                  <p>Please check your tracking number and try again.</p>
-                </div>
-              </div>
-            </section>
-          )}
           <div className="tracking-card">
             <h2>Track Your Shipment</h2>
             <p className="tracking-subtitle">
@@ -277,43 +257,6 @@ const TrackingPage = ({
         <>
           <section className="shipment-status">
             <div className="container">
-              <div className="status-card">
-                <div className="status-header">
-                  <h3>Package Details</h3>
-                  <span className={`status-badge ${shipmentData.status}`}>
-                    {shipmentData.status === "delivered" && "🟢 Delivered"}
-                    {shipmentData.status === "in_transit" && "🟡 In Transit"}
-                    {shipmentData.status === "pending" && "🟠 Pending"}
-                  </span>
-                </div>
-                <div className="status-details">
-                  <div className="detail-item">
-                    <span className="detail-label">Product Name:</span>
-                    <span className="detail-value">
-                      {shipmentData.productDetails.name}
-                    </span>
-                  </div>
-                  <div className="detail-item">
-                    <span className="detail-label">Total Weight:</span>
-                    <span className="detail-value">
-                      {shipmentData.productDetails.weight}
-                      {"kg"}
-                    </span>
-                  </div>
-                  <div className="detail-item">
-                    <span className="detail-label">Quantity:</span>
-                    <span className="detail-value">
-                      {shipmentData.productDetails.quantity}
-                    </span>
-                  </div>
-                  <div className="detail-item">
-                    <span className="detail-label">Estimated Delivery:</span>
-                    <span className="detail-value">
-                      {shipmentData.estimatedDelivery}
-                    </span>
-                  </div>
-                </div>
-              </div>
               <div className="status-card">
                 <div className="status-header">
                   <h3>Tracking Number: {shipmentData.trackingNumber}</h3>
@@ -385,6 +328,18 @@ const TrackingPage = ({
             </div>
           </section>
         </>
+      )}
+
+      {shipmentData && shipmentData.error && (
+        <section className="error-section">
+          <div className="container">
+            <div className="error-card">
+              <Package size={48} />
+              <h3>Tracking number not found</h3>
+              <p>Please check your tracking number and try again.</p>
+            </div>
+          </div>
+        </section>
       )}
     </>
   );
@@ -766,7 +721,6 @@ const App = () => {
   const [currentPage, setCurrentPage] = useState("landing");
   const [trackingNumber, setTrackingNumber] = useState("");
   const [shipmentData, setShipmentData] = useState(null);
-  const [error, setError] = useState(null);
 
   // const handleTrack = () => {
   //   const trimmedNumber = trackingNumber.trim().toUpperCase();
@@ -781,8 +735,6 @@ const App = () => {
   // };
 
   const handleTrack = async () => {
-    setShipmentData(null);
-    setError(null);
     const response = await fetch(
       `${API_URL}/shipments/track/${trackingNumber}`
     );
@@ -790,8 +742,6 @@ const App = () => {
 
     if (result.success) {
       setShipmentData(result.data);
-    } else {
-      setError(result.error);
     }
   };
 
@@ -940,7 +890,7 @@ const App = () => {
         .hero {
           padding: 5rem 0;
           background: 
-            linear-gradient(135deg, rgba(1, 2, 2, 0.65) 0%, rgba(13, 35, 58, 0.6) 100%),
+            linear-gradient(135deg, rgba(1, 2, 2, 0.95) 0%, rgba(13, 35, 58, 0.9) 100%),
             url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1600&q=80');
           background-size: cover;
           background-position: center;
@@ -1079,12 +1029,7 @@ const App = () => {
 
         .cta-section {
           padding: 5rem 0;
-                    background: 
-            linear-gradient(135deg, rgba(1, 2, 2, 0.65) 0%, rgba(13, 35, 58, 0.6) 100%),
-            url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1600&q=80');
-          background-size: cover;
-          background-position: center;
-          background-attachment: fixed;
+          background: linear-gradient(135deg, #004AAD 0%, #0066CC 100%);
           color: white;
         }
 
@@ -1159,7 +1104,6 @@ const App = () => {
           padding: 2rem;
           border-radius: 12px;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-          margin-bottom: 20px;
         }
 
         .status-header {
@@ -1276,7 +1220,6 @@ const App = () => {
 
         .error-section {
           padding: 3rem 0;
-          margin-top: -18vh;
         }
 
         .error-card {
@@ -1296,7 +1239,6 @@ const App = () => {
 
         .error-card h3 {
           margin-bottom: 0.5rem;
-          color: red;
         }
 
         .error-card p {
@@ -1347,12 +1289,7 @@ const App = () => {
 
         .page-hero {
           padding: 4rem 0;
-                    background: 
-            linear-gradient(135deg, rgba(1, 2, 2, 0.65) 0%, rgba(13, 35, 58, 0.6) 100%),
-            url('https://images.unsplash.com/photo-1691591765923-3bd6f12f4209?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1032');
-          background-size: cover;
-          background-position: center;
-          background-attachment: fixed;
+          background: linear-gradient(135deg,rgb(0, 0, 0) 0%,rgb(15, 43, 70) 100%),url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1600&q=80');;
           color: white;
           text-align: center;
         }
@@ -1742,9 +1679,6 @@ const App = () => {
           setTrackingNumber={setTrackingNumber}
           shipmentData={shipmentData}
           onTrack={handleTrack}
-          error={error}
-          setError={setError}
-          setShipmentData={setShipmentData}
         />
       )}
       {currentPage === "about" && <AboutPage />}
