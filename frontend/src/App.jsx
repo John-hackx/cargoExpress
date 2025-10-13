@@ -65,10 +65,10 @@ const SAMPLE_SHIPMENTS = {
 };
 
 // Navbar Component
-const Navbar = ({ onNavigate, onTrackClick }) => (
+const Navbar = ({ onNavigate, onTrackClick, setCurrentPage }) => (
   <nav className="navbar">
     <div className="container nav-content">
-      <div className="logo">
+      <div onClick={() => setCurrentPage("landing")} className="logo">
         <Truck size={32} />
         <span>CargoExpress</span>
       </div>
@@ -1795,7 +1795,11 @@ const App = () => {
         }
       `}</style>
 
-      <Navbar onNavigate={handleNavigate} onTrackClick={handleTrackClick} />
+      <Navbar
+        setCurrentPage={setCurrentPage}
+        onNavigate={handleNavigate}
+        onTrackClick={handleTrackClick}
+      />
 
       {currentPage === "landing" && (
         <LandingPage onTrackClick={handleTrackClick} />
