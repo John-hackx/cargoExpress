@@ -1,0 +1,52 @@
+.hero {
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.tracking-card {
+  background: #fff;
+  color: #000;
+  padding: 1.5rem;
+  border-radius: 10px;
+  position: absolute;
+  right: 10%;
+  bottom: 15%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  width: 280px;
+}
+
+.tracking-card h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.tracking-card ul {
+  list-style: none;
+  padding: 0;
+}
+
+.tracking-card li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.dot {
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.dot.green {
+  background-color: #00c853;
+}
+.dot.yellow {
+  background-color: #ffab00;
+}
+.dot.gray {
+  background-color: #b0bec5;
+}
