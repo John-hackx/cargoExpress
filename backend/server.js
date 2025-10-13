@@ -9,7 +9,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 // Middleware
 const allowedOrigins = [
-  "https://cargo-express-two.vercel.app/",
+  "https://cargo-express-two.vercel.app",
   "http://localhost:5173",
 ];
 app.use(
