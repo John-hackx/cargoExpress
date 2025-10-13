@@ -31,6 +31,16 @@ export const trackShipment = async (req, res) => {
         city: shipment.destination?.city,
         country: shipment.destination?.country,
       },
+      sender: {
+        name: shipment.sender.name,
+        email: shipment.sender.email,
+        phone: shipment.sender.phone,
+      },
+      recipient: {
+        name: shipment.recipient.name,
+        email: shipment.recipient.email,
+        phone: shipment.recipient.phone,
+      },
       estimatedDelivery: shipment.estimatedDelivery,
       actualDelivery: shipment.actualDelivery,
       currentLocation: shipment.currentLocation,

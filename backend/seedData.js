@@ -18,7 +18,7 @@ export const sampleShipments = [
     },
     destination: {
       address: "85100 Potenza (Italia)",
-      city: "Viena",
+      city: "Rome",
       country: "Italy",
       coordinates: { lat: 5.6037, lng: -0.187 },
     },

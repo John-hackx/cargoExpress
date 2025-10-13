@@ -306,6 +306,7 @@ const TrackingPage = ({
                       {shipmentData.productDetails.quantity}
                     </span>
                   </div>
+
                   <div className="detail-item">
                     <span className="detail-label">Estimated Delivery:</span>
                     <span className="detail-value">
@@ -314,6 +315,69 @@ const TrackingPage = ({
                   </div>
                 </div>
               </div>
+              {/* Sender's Details */}
+              <div className="status-card">
+                <div className="status-header">
+                  <h3>Sender's Details</h3>
+                  <span className={`status-badge ${shipmentData.status}`}>
+                    {shipmentData.status === "delivered" && "🟢 Delivered"}
+                    {shipmentData.status === "in_transit" && "🟡 In Transit"}
+                    {shipmentData.status === "pending" && "🟠 Pending"}
+                  </span>
+                </div>
+                <div className="status-details">
+                  <div className="detail-item">
+                    <span className="detail-label">Name:</span>
+                    <span className="detail-value">
+                      {shipmentData.sender.name}
+                    </span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Email:</span>
+                    <span className="detail-value">
+                      {shipmentData.sender.email}
+                    </span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Phone:</span>
+                    <span className="detail-value">
+                      {shipmentData.sender.phone}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              {/* Recipient's Details */}
+              <div className="status-card">
+                <div className="status-header">
+                  <h3>Recipient's Details</h3>
+                  <span className={`status-badge ${shipmentData.status}`}>
+                    {shipmentData.status === "delivered" && "🟢 Delivered"}
+                    {shipmentData.status === "in_transit" && "🟡 In Transit"}
+                    {shipmentData.status === "pending" && "🟠 Pending"}
+                  </span>
+                </div>
+                <div className="status-details">
+                  <div className="detail-item">
+                    <span className="detail-label">Name:</span>
+                    <span className="detail-value">
+                      {shipmentData.recipient.name}
+                    </span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Email:</span>
+                    <span className="detail-value">
+                      {shipmentData.recipient.email}
+                    </span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Phone:</span>
+                    <span className="detail-value">
+                      {shipmentData.recipient.phone}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              {/* Tracking info */}
               <div className="status-card">
                 <div className="status-header">
                   <h3>Tracking Number: {shipmentData.trackingNumber}</h3>
