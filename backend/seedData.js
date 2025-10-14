@@ -3,8 +3,8 @@
 import dotenv from "dotenv";
 export const sampleShipments = [
   {
-    trackingNumber: "ST12345",
-    status: "delivered",
+    trackingNumber: "ST34900125",
+    status: "in-transit",
     origin: {
       address: "Accra Ghana",
       city: "Accra",
@@ -39,8 +39,8 @@ export const sampleShipments = [
       value: 1200,
     },
     serviceType: "express",
-    estimatedDelivery: new Date("2025-10-11"),
-    actualDelivery: new Date("2025-10-11T15:45:00"),
+    estimatedDelivery: new Date("2025-10-22"),
+    actualDelivery: new Date("2025-10-22T15:45:00"),
     currentLocation: {
       city: "Accra",
       country: "Ghana",
@@ -55,10 +55,10 @@ export const sampleShipments = [
         description: "Package delivered and signed by recipient",
       },
       {
-        status: "Out for Delivery",
+        status: "Delivered",
         location: "Tema, Ghana",
         time: new Date("2025-10-11T10:00:00"),
-        icon: "truck",
+        icon: "check",
         description: "Package loaded on delivery vehicle",
       },
       {

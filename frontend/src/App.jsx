@@ -282,7 +282,7 @@ const TrackingPage = ({
                   <h3>Package Details</h3>
                   <span className={`status-badge ${shipmentData.status}`}>
                     {shipmentData.status === "delivered" && "🟢 Delivered"}
-                    {shipmentData.status === "in_transit" && "🟡 In Transit"}
+                    {shipmentData.status === "in-transit" && "🟡 In Transit"}
                     {shipmentData.status === "pending" && "🟠 Pending"}
                   </span>
                 </div>
@@ -443,6 +443,7 @@ const TrackingPage = ({
                       <p>{event.location}</p>
                       <span className="timeline-time">{event.time}</span>
                     </div>
+                    {event.status === "Delivered" && <span>🟢</span>}
                   </div>
                 ))}
               </div>
