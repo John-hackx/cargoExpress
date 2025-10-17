@@ -18,6 +18,7 @@ import {
   Target,
   Award,
   Shield,
+  Languages,
 } from "lucide-react";
 
 // Sample shipment data - moved outside component to prevent recreation
@@ -64,151 +65,290 @@ const SAMPLE_SHIPMENTS = {
   },
 };
 
-// Navbar Component
-const Navbar = ({ onNavigate, onTrackClick, setCurrentPage }) => (
-  <nav className="navbar">
-    <div className="container nav-content">
-      <div onClick={() => setCurrentPage("landing")} className="logo">
-        <Truck size={32} />
-        <span>CargoExpress</span>
-      </div>
-      <div className="nav-links">
-        <a
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            onNavigate("landing");
-          }}
-        >
-          Home
-        </a>
-        <a
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            onNavigate("tracking");
-          }}
-        >
-          Track Package
-        </a>
-        <a
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            onNavigate("about");
-          }}
-        >
-          About
-        </a>
-        <a
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            onNavigate("contact");
-          }}
-        >
-          Contact
-        </a>
-      </div>
-      <button className="btn-primary" onClick={onTrackClick}>
-        Track Shipment
-      </button>
-    </div>
-  </nav>
+// Translation function using LibreTranslate
+const translateText = async (text, targetLang = "it") => {
+  if (!text || targetLang === "en") return text;
+
+  try {
+    const response = await fetch("https://libretranslate.de/translate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        q: text,
+        source: "en",
+        target: targetLang,
+        format: "text",
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data.translatedText;
+    }
+    return text; // Fallback to original text if translation fails
+  } catch (error) {
+    console.error("Translation error:", error);
+    return text; // Fallback to original text
+  }
+};
+
+// Translation hook
+const useTranslation = (language) => {
+  const [translations, setTranslations] = useState({});
+  const [isTranslating, setIsTranslating] = useState(false);
+
+  const translateContent = async (content) => {
+    if (language === "en") {
+      setTranslations(content);
+      return;
+    }
+
+    setIsTranslating(true);
+    const translatedContent = {};
+
+    for (const [key, value] of Object.entries(content)) {
+      if (typeof value === "string") {
+        translatedContent[key] = await translateText(value, language);
+      } else {
+        translatedContent[key] = value;
+      }
+    }
+
+    setTranslations(translatedContent);
+    setIsTranslating(false);
+  };
+
+  return { translations, translateContent, isTranslating };
+};
+
+// Language Selector Component
+const LanguageSelector = ({ currentLanguage, onLanguageChange }) => (
+  <div className="language-selector">
+    <Languages size={20} />
+    <select
+      value={currentLanguage}
+      onChange={(e) => onLanguageChange(e.target.value)}
+      className="language-dropdown"
+    >
+      <option value="en">English</option>
+      <option value="it">Italiano</option>
+    </select>
+  </div>
 );
 
-// Landing Page Component
-const LandingPage = ({ onTrackClick }) => (
-  <>
-    <section className="hero">
-      <div className="container hero-content">
-        <div className="hero-left">
-          <h1>Fast, Reliable Shipping & Real-Time Tracking</h1>
-          <p>
-            Track your packages from dispatch to delivery — anytime, anywhere.
-          </p>
-          <button className="btn-primary btn-large" onClick={onTrackClick}>
-            Track Now <ChevronRight size={20} />
+// Navbar Component
+const Navbar = ({
+  onNavigate,
+  onTrackClick,
+  setCurrentPage,
+  currentLanguage,
+  onLanguageChange,
+}) => {
+  const { translations, translateContent } = useTranslation(currentLanguage);
+
+  const navContent = {
+    home: "Home",
+    trackPackage: "Track Package",
+    about: "About",
+    contact: "Contact",
+    trackShipment: "Track Shipment",
+  };
+
+  useEffect(() => {
+    translateContent(navContent);
+  }, [currentLanguage]);
+
+  return (
+    <nav className="navbar">
+      <div className="container nav-content">
+        <div onClick={() => setCurrentPage("landing")} className="logo">
+          <Truck size={32} />
+          <span>CargoExpress</span>
+        </div>
+        <div className="nav-links">
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              onNavigate("landing");
+            }}
+          >
+            {translations.home || navContent.home}
+          </a>
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              onNavigate("tracking");
+            }}
+          >
+            {translations.trackPackage || navContent.trackPackage}
+          </a>
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              onNavigate("about");
+            }}
+          >
+            {translations.about || navContent.about}
+          </a>
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              onNavigate("contact");
+            }}
+          >
+            {translations.contact || navContent.contact}
+          </a>
+        </div>
+        <div className="nav-actions">
+          <LanguageSelector
+            currentLanguage={currentLanguage}
+            onLanguageChange={onLanguageChange}
+          />
+          <button className="btn-primary" onClick={onTrackClick}>
+            {translations.trackShipment || navContent.trackShipment}
           </button>
         </div>
-        <div className="hero-right">
-          <div className="hero-illustration">
-            <Truck size={200} strokeWidth={1} />
+      </div>
+    </nav>
+  );
+};
+
+// Landing Page Component
+const LandingPage = ({ onTrackClick, currentLanguage }) => {
+  const { translations, translateContent } = useTranslation(currentLanguage);
+
+  const landingContent = {
+    title: "Fast, Reliable Shipping & Real-Time Tracking",
+    subtitle:
+      "Track your packages from dispatch to delivery — anytime, anywhere.",
+    trackNow: "Track Now",
+    expressDelivery: "Express Delivery",
+    expressDesc: "Get your parcels delivered faster",
+    realTimeTracking: "Real-Time Tracking",
+    realTimeDesc: "See every step your shipment takes",
+    globalCoverage: "Global Coverage",
+    globalDesc: "We connect across continents",
+    support: "24/7 Support",
+    supportDesc: "We're always here to help",
+    howItWorks: "How Tracking Works",
+    step1: "Enter Tracking Number",
+    step1Desc: "Input your unique tracking code",
+    step2: "Get Real-Time Updates",
+    step2Desc: "View live shipment status",
+    step3: "Receive Your Package",
+    step3Desc: "Get notified on delivery",
+    ctaTitle: "Track your shipment now and stay updated every step of the way.",
+    ctaButton: "Track Package",
+  };
+
+  useEffect(() => {
+    translateContent(landingContent);
+  }, [currentLanguage]);
+
+  return (
+    <>
+      <section className="hero">
+        <div className="container hero-content">
+          <div className="hero-left">
+            <h1>{translations.title || landingContent.title}</h1>
+            <p>{translations.subtitle || landingContent.subtitle}</p>
+            <button className="btn-primary btn-large" onClick={onTrackClick}>
+              {translations.trackNow || landingContent.trackNow}{" "}
+              <ChevronRight size={20} />
+            </button>
+          </div>
+          <div className="hero-right">
+            <div className="hero-illustration">
+              <Truck size={200} strokeWidth={1} />
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <section className="features">
-      <div className="container">
-        <div className="features-grid">
-          <div className="feature-card">
-            <div className="feature-icon">
-              <Package size={40} />
+      <section className="features">
+        <div className="container">
+          <div className="features-grid">
+            <div className="feature-card">
+              <div className="feature-icon">
+                <Package size={40} />
+              </div>
+              <h3>
+                {translations.expressDelivery || landingContent.expressDelivery}
+              </h3>
+              <p>{translations.expressDesc || landingContent.expressDesc}</p>
             </div>
-            <h3>Express Delivery</h3>
-            <p>Get your parcels delivered faster</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">
-              <MapPin size={40} />
+            <div className="feature-card">
+              <div className="feature-icon">
+                <MapPin size={40} />
+              </div>
+              <h3>
+                {translations.realTimeTracking ||
+                  landingContent.realTimeTracking}
+              </h3>
+              <p>{translations.realTimeDesc || landingContent.realTimeDesc}</p>
             </div>
-            <h3>Real-Time Tracking</h3>
-            <p>See every step your shipment takes</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">
-              <Globe size={40} />
+            <div className="feature-card">
+              <div className="feature-icon">
+                <Globe size={40} />
+              </div>
+              <h3>
+                {translations.globalCoverage || landingContent.globalCoverage}
+              </h3>
+              <p>{translations.globalDesc || landingContent.globalDesc}</p>
             </div>
-            <h3>Global Coverage</h3>
-            <p>We connect across continents</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">
-              <MessageCircle size={40} />
+            <div className="feature-card">
+              <div className="feature-icon">
+                <MessageCircle size={40} />
+              </div>
+              <h3>{translations.support || landingContent.support}</h3>
+              <p>{translations.supportDesc || landingContent.supportDesc}</p>
             </div>
-            <h3>24/7 Support</h3>
-            <p>We're always here to help</p>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <section className="how-it-works">
-      <div className="container">
-        <h2>How Tracking Works</h2>
-        <div className="steps-grid">
-          <div className="step">
-            <div className="step-number">1</div>
-            <h3>Enter Tracking Number</h3>
-            <p>Input your unique tracking code</p>
-          </div>
-          <div className="step-connector"></div>
-          <div className="step">
-            <div className="step-number">2</div>
-            <h3>Get Real-Time Updates</h3>
-            <p>View live shipment status</p>
-          </div>
-          <div className="step-connector"></div>
-          <div className="step">
-            <div className="step-number">3</div>
-            <h3>Receive Your Package</h3>
-            <p>Get notified on delivery</p>
+      <section className="how-it-works">
+        <div className="container">
+          <h2>{translations.howItWorks || landingContent.howItWorks}</h2>
+          <div className="steps-grid">
+            <div className="step">
+              <div className="step-number">1</div>
+              <h3>{translations.step1 || landingContent.step1}</h3>
+              <p>{translations.step1Desc || landingContent.step1Desc}</p>
+            </div>
+            <div className="step-connector"></div>
+            <div className="step">
+              <div className="step-number">2</div>
+              <h3>{translations.step2 || landingContent.step2}</h3>
+              <p>{translations.step2Desc || landingContent.step2Desc}</p>
+            </div>
+            <div className="step-connector"></div>
+            <div className="step">
+              <div className="step-number">3</div>
+              <h3>{translations.step3 || landingContent.step3}</h3>
+              <p>{translations.step3Desc || landingContent.step3Desc}</p>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <section className="cta-section">
-      <div className="container cta-content">
-        <h2>Track your shipment now and stay updated every step of the way.</h2>
-        <button className="btn-secondary btn-large" onClick={onTrackClick}>
-          Track Package
-        </button>
-      </div>
-    </section>
-  </>
-);
+      <section className="cta-section">
+        <div className="container cta-content">
+          <h2>{translations.ctaTitle || landingContent.ctaTitle}</h2>
+          <button className="btn-secondary btn-large" onClick={onTrackClick}>
+            {translations.ctaButton || landingContent.ctaButton}
+          </button>
+        </div>
+      </section>
+    </>
+  );
+};
 
 // Tracking Page Component
 const TrackingPage = ({
@@ -219,7 +359,43 @@ const TrackingPage = ({
   error,
   setError,
   setShipmentData,
+  currentLanguage,
 }) => {
+  const { translations, translateContent } = useTranslation(currentLanguage);
+
+  const trackingContent = {
+    trackYourShipment: "Track Your Shipment",
+    enterTrackingNumber: "Enter your tracking number to get real-time updates",
+    placeholder: "Enter your tracking number",
+    track: "Track",
+    trySample: "Try sample: ST123456789",
+    trackingNotFound: "Tracking number not found!!!",
+    checkNumber: "Please check your tracking number and try again.",
+    packageDetails: "Package Details",
+    productName: "Product Name:",
+    totalWeight: "Total Weight:",
+    quantity: "Quantity:",
+    estimatedDelivery: "Estimated Delivery:",
+    sendersDetails: "Sender's Details",
+    recipientsDetails: "Recipient's Details",
+    name: "Name:",
+    email: "Email:",
+    phone: "Phone:",
+    origin: "Origin:",
+    destination: "Destination:",
+    lastUpdate: "Last Update:",
+    shipmentHistory: "Shipment History",
+    delivered: "Delivered",
+    outForDelivery: "Out for Delivery",
+    arrivedHub: "Arrived at Local Hub",
+    inTransit: "In Transit",
+    shipmentCreated: "Shipment Created",
+  };
+
+  useEffect(() => {
+    translateContent(trackingContent);
+  }, [currentLanguage]);
+
   const handleInputChange = (e) => {
     setTrackingNumber(e.target.value);
   };
@@ -245,30 +421,43 @@ const TrackingPage = ({
               <div className="container">
                 <div className="error-card">
                   <Package size={48} />
-                  <h3>Tracking number not found!!!</h3>
-                  <p>Please check your tracking number and try again.</p>
+                  <h3>
+                    {translations.trackingNotFound ||
+                      trackingContent.trackingNotFound}
+                  </h3>
+                  <p>
+                    {translations.checkNumber || trackingContent.checkNumber}
+                  </p>
                 </div>
               </div>
             </section>
           )}
           <div className="tracking-card">
-            <h2>Track Your Shipment</h2>
+            <h2>
+              {translations.trackYourShipment ||
+                trackingContent.trackYourShipment}
+            </h2>
             <p className="tracking-subtitle">
-              Enter your tracking number to get real-time updates
+              {translations.enterTrackingNumber ||
+                trackingContent.enterTrackingNumber}
             </p>
             <div className="input-group">
               <input
                 type="text"
-                placeholder="Enter your tracking number"
+                placeholder={
+                  translations.placeholder || trackingContent.placeholder
+                }
                 value={trackingNumber}
                 onChange={handleInputChange}
                 onKeyPress={handleKeyPress}
               />
               <button className="btn-primary" onClick={onTrack}>
-                Track
+                {translations.track || trackingContent.track}
               </button>
             </div>
-            <p className="hint-text">Try sample: ST123456789</p>
+            <p className="hint-text">
+              {translations.trySample || trackingContent.trySample}
+            </p>
           </div>
         </div>
       </section>
@@ -279,7 +468,10 @@ const TrackingPage = ({
             <div className="container">
               <div className="status-card">
                 <div className="status-header">
-                  <h3>Package Details</h3>
+                  <h3>
+                    {translations.packageDetails ||
+                      trackingContent.packageDetails}
+                  </h3>
                   <span className={`status-badge ${shipmentData.status}`}>
                     {shipmentData.status === "delivered" && "🟢 Delivered"}
                     {shipmentData.status === "in-transit" && "🟡 In Transit"}
@@ -288,27 +480,36 @@ const TrackingPage = ({
                 </div>
                 <div className="status-details">
                   <div className="detail-item">
-                    <span className="detail-label">Product Name:</span>
+                    <span className="detail-label">
+                      {translations.productName || trackingContent.productName}
+                    </span>
                     <span className="detail-value">
                       {shipmentData.productDetails.name}
                     </span>
                   </div>
                   <div className="detail-item">
-                    <span className="detail-label">Total Weight:</span>
+                    <span className="detail-label">
+                      {translations.totalWeight || trackingContent.totalWeight}
+                    </span>
                     <span className="detail-value">
                       {shipmentData.productDetails.weight}
                       {"kg"}
                     </span>
                   </div>
                   <div className="detail-item">
-                    <span className="detail-label">Quantity:</span>
+                    <span className="detail-label">
+                      {translations.quantity || trackingContent.quantity}
+                    </span>
                     <span className="detail-value">
                       {shipmentData.productDetails.quantity}
                     </span>
                   </div>
 
                   <div className="detail-item">
-                    <span className="detail-label">Estimated Delivery:</span>
+                    <span className="detail-label">
+                      {translations.estimatedDelivery ||
+                        trackingContent.estimatedDelivery}
+                    </span>
                     <span className="detail-value">
                       {shipmentData.estimatedDelivery}
                     </span>
@@ -318,7 +519,10 @@ const TrackingPage = ({
               {/* Sender's Details */}
               <div className="status-card">
                 <div className="status-header">
-                  <h3>Sender's Details</h3>
+                  <h3>
+                    {translations.sendersDetails ||
+                      trackingContent.sendersDetails}
+                  </h3>
                   <span className={`status-badge ${shipmentData.status}`}>
                     {shipmentData.status === "delivered" && "🟢 Delivered"}
                     {shipmentData.status === "in_transit" && "🟡 In Transit"}
@@ -327,19 +531,25 @@ const TrackingPage = ({
                 </div>
                 <div className="status-details">
                   <div className="detail-item">
-                    <span className="detail-label">Name:</span>
+                    <span className="detail-label">
+                      {translations.name || trackingContent.name}
+                    </span>
                     <span className="detail-value">
                       {shipmentData.sender.name}
                     </span>
                   </div>
                   <div className="detail-item">
-                    <span className="detail-label">Email:</span>
+                    <span className="detail-label">
+                      {translations.email || trackingContent.email}
+                    </span>
                     <span className="detail-value">
                       {shipmentData.sender.email}
                     </span>
                   </div>
                   <div className="detail-item">
-                    <span className="detail-label">Phone:</span>
+                    <span className="detail-label">
+                      {translations.phone || trackingContent.phone}
+                    </span>
                     <span className="detail-value">
                       {shipmentData.sender.phone}
                     </span>
@@ -349,7 +559,10 @@ const TrackingPage = ({
               {/* Recipient's Details */}
               <div className="status-card">
                 <div className="status-header">
-                  <h3>Recipient's Details</h3>
+                  <h3>
+                    {translations.recipientsDetails ||
+                      trackingContent.recipientsDetails}
+                  </h3>
                   <span className={`status-badge ${shipmentData.status}`}>
                     {shipmentData.status === "delivered" && "🟢 Delivered"}
                     {shipmentData.status === "in_transit" && "🟡 In Transit"}
@@ -358,19 +571,25 @@ const TrackingPage = ({
                 </div>
                 <div className="status-details">
                   <div className="detail-item">
-                    <span className="detail-label">Name:</span>
+                    <span className="detail-label">
+                      {translations.name || trackingContent.name}
+                    </span>
                     <span className="detail-value">
                       {shipmentData.recipient.name}
                     </span>
                   </div>
                   <div className="detail-item">
-                    <span className="detail-label">Email:</span>
+                    <span className="detail-label">
+                      {translations.email || trackingContent.email}
+                    </span>
                     <span className="detail-value">
                       {shipmentData.recipient.email}
                     </span>
                   </div>
                   <div className="detail-item">
-                    <span className="detail-label">Phone:</span>
+                    <span className="detail-label">
+                      {translations.phone || trackingContent.phone}
+                    </span>
                     <span className="detail-value">
                       {shipmentData.recipient.phone}
                     </span>
@@ -389,26 +608,35 @@ const TrackingPage = ({
                 </div>
                 <div className="status-details">
                   <div className="detail-item">
-                    <span className="detail-label">Origin:</span>
+                    <span className="detail-label">
+                      {translations.origin || trackingContent.origin}
+                    </span>
                     <span className="detail-value">
                       {shipmentData.origin.city}, {shipmentData.origin.country}
                     </span>
                   </div>
                   <div className="detail-item">
-                    <span className="detail-label">Destination:</span>
+                    <span className="detail-label">
+                      {translations.destination || trackingContent.destination}
+                    </span>
                     <span className="detail-value">
                       {shipmentData.destination.city},{" "}
                       {shipmentData.destination.country}
                     </span>
                   </div>
                   <div className="detail-item">
-                    <span className="detail-label">Last Update:</span>
+                    <span className="detail-label">
+                      {translations.lastUpdate || trackingContent.lastUpdate}
+                    </span>
                     <span className="detail-value">
                       {shipmentData.lastUpdate}
                     </span>
                   </div>
                   <div className="detail-item">
-                    <span className="detail-label">Estimated Delivery:</span>
+                    <span className="detail-label">
+                      {translations.estimatedDelivery ||
+                        trackingContent.estimatedDelivery}
+                    </span>
                     <span className="detail-value">
                       {shipmentData.estimatedDelivery}
                     </span>
@@ -420,7 +648,10 @@ const TrackingPage = ({
 
           <section className="timeline-section">
             <div className="container">
-              <h3>Shipment History</h3>
+              <h3>
+                {translations.shipmentHistory ||
+                  trackingContent.shipmentHistory}
+              </h3>
               <div className="timeline">
                 {shipmentData.timeline.map((event, index) => (
                   <div key={index} className="timeline-item">
@@ -432,13 +663,19 @@ const TrackingPage = ({
                     </div>
                     <div className="timeline-content">
                       <h4>
-                        {event.status === "delivered" && "Delivered"}
+                        {event.status === "delivered" &&
+                          (translations.delivered || trackingContent.delivered)}
                         {event.status === "out_for_delivery" &&
-                          "Out for Delivery"}
+                          (translations.outForDelivery ||
+                            trackingContent.outForDelivery)}
                         {event.status === "arrived_hub" &&
-                          "Arrived at Local Hub"}
-                        {event.status === "in_transit" && "In Transit"}
-                        {event.status === "created" && "Shipment Created"}
+                          (translations.arrivedHub ||
+                            trackingContent.arrivedHub)}
+                        {event.status === "in_transit" &&
+                          (translations.inTransit || trackingContent.inTransit)}
+                        {event.status === "created" &&
+                          (translations.shipmentCreated ||
+                            trackingContent.shipmentCreated)}
                       </h4>
                       <p>{event.location}</p>
                       <span className="timeline-time">{event.time}</span>
@@ -456,141 +693,175 @@ const TrackingPage = ({
 };
 
 // About Page Component
-const AboutPage = () => (
-  <>
-    <section className="page-hero">
-      <div className="container">
-        <h1>About CargoExpress</h1>
-        <p>
-          Leading the way in global logistics and shipment tracking solutions
-        </p>
-      </div>
-    </section>
+const AboutPage = ({ currentLanguage }) => {
+  const { translations, translateContent } = useTranslation(currentLanguage);
 
-    <section className="about-content">
-      <div className="container">
-        <div className="about-intro">
-          <h2>Who We Are</h2>
-          <p>
-            CargoExpress is a premier logistics company dedicated to providing
-            seamless shipping and tracking solutions across the globe. With
-            years of experience in the industry, we've built a reputation for
-            reliability, speed, and customer satisfaction.
-          </p>
-          <p>
-            Our state-of-the-art tracking technology ensures that you're always
-            informed about your shipment's location and status. From small
-            parcels to large cargo, we handle every delivery with the utmost
-            care and professionalism.
-          </p>
+  const aboutContent = {
+    title: "About CargoExpress",
+    subtitle:
+      "Leading the way in global logistics and shipment tracking solutions",
+    whoWeAre: "Who We Are",
+    aboutText1:
+      "CargoExpress is a premier logistics company dedicated to providing seamless shipping and tracking solutions across the globe. With years of experience in the industry, we've built a reputation for reliability, speed, and customer satisfaction.",
+    aboutText2:
+      "Our state-of-the-art tracking technology ensures that you're always informed about your shipment's location and status. From small parcels to large cargo, we handle every delivery with the utmost care and professionalism.",
+    ourMission: "Our Mission",
+    missionText:
+      "To revolutionize global logistics by providing fast, reliable, and transparent shipping solutions that connect businesses and individuals worldwide.",
+    ourVision: "Our Vision",
+    visionText:
+      "To be the world's most trusted logistics partner, known for innovation, excellence, and unwavering commitment to customer success.",
+    ourValues: "Our Values",
+    valuesText:
+      "Integrity, reliability, innovation, and customer-first approach guide everything we do. We believe in building lasting relationships through trust.",
+    deliveriesCompleted: "Deliveries Completed",
+    countriesCovered: "Countries Covered",
+    onTimeDelivery: "On-Time Delivery",
+    customerSupport: "Customer Support",
+    whyChoose: "Why Choose ShipTrack?",
+    secureInsured: "Secure & Insured",
+    secureDesc:
+      "All shipments are fully insured and handled with maximum security protocols",
+    fastDelivery: "Fast Delivery",
+    fastDesc:
+      "Express shipping options available with guaranteed delivery timelines",
+    globalNetwork: "Global Network",
+    globalNetworkDesc:
+      "Extensive network spanning over 150 countries and territories",
+    realTimeTracking: "Real-Time Tracking",
+    realTimeDesc:
+      "Advanced GPS tracking with live updates at every stage of delivery",
+  };
+
+  useEffect(() => {
+    translateContent(aboutContent);
+  }, [currentLanguage]);
+
+  return (
+    <>
+      <section className="page-hero">
+        <div className="container">
+          <h1>{translations.title || aboutContent.title}</h1>
+          <p>{translations.subtitle || aboutContent.subtitle}</p>
         </div>
+      </section>
 
-        <div className="values-grid">
-          <div className="value-card">
-            <div className="value-icon">
-              <Target size={48} />
-            </div>
-            <h3>Our Mission</h3>
-            <p>
-              To revolutionize global logistics by providing fast, reliable, and
-              transparent shipping solutions that connect businesses and
-              individuals worldwide.
-            </p>
+      <section className="about-content">
+        <div className="container">
+          <div className="about-intro">
+            <h2>{translations.whoWeAre || aboutContent.whoWeAre}</h2>
+            <p>{translations.aboutText1 || aboutContent.aboutText1}</p>
+            <p>{translations.aboutText2 || aboutContent.aboutText2}</p>
           </div>
-          <div className="value-card">
-            <div className="value-icon">
-              <Users size={48} />
-            </div>
-            <h3>Our Vision</h3>
-            <p>
-              To be the world's most trusted logistics partner, known for
-              innovation, excellence, and unwavering commitment to customer
-              success.
-            </p>
-          </div>
-          <div className="value-card">
-            <div className="value-icon">
-              <Award size={48} />
-            </div>
-            <h3>Our Values</h3>
-            <p>
-              Integrity, reliability, innovation, and customer-first approach
-              guide everything we do. We believe in building lasting
-              relationships through trust.
-            </p>
-          </div>
-        </div>
 
-        <div className="stats-section">
-          <div className="stat-item">
-            <h3>500K+</h3>
-            <p>Deliveries Completed</p>
+          <div className="values-grid">
+            <div className="value-card">
+              <div className="value-icon">
+                <Target size={48} />
+              </div>
+              <h3>{translations.ourMission || aboutContent.ourMission}</h3>
+              <p>{translations.missionText || aboutContent.missionText}</p>
+            </div>
+            <div className="value-card">
+              <div className="value-icon">
+                <Users size={48} />
+              </div>
+              <h3>{translations.ourVision || aboutContent.ourVision}</h3>
+              <p>{translations.visionText || aboutContent.visionText}</p>
+            </div>
+            <div className="value-card">
+              <div className="value-icon">
+                <Award size={48} />
+              </div>
+              <h3>{translations.ourValues || aboutContent.ourValues}</h3>
+              <p>{translations.valuesText || aboutContent.valuesText}</p>
+            </div>
           </div>
-          <div className="stat-item">
-            <h3>150+</h3>
-            <p>Countries Covered</p>
-          </div>
-          <div className="stat-item">
-            <h3>99.8%</h3>
-            <p>On-Time Delivery</p>
-          </div>
-          <div className="stat-item">
-            <h3>24/7</h3>
-            <p>Customer Support</p>
-          </div>
-        </div>
 
-        <div className="why-choose">
-          <h2>Why Choose ShipTrack?</h2>
-          <div className="features-list">
-            <div className="feature-item">
-              <Shield size={32} />
-              <div>
-                <h4>Secure & Insured</h4>
-                <p>
-                  All shipments are fully insured and handled with maximum
-                  security protocols
-                </p>
+          <div className="stats-section">
+            <div className="stat-item">
+              <h3>500K+</h3>
+              <p>
+                {translations.deliveriesCompleted ||
+                  aboutContent.deliveriesCompleted}
+              </p>
+            </div>
+            <div className="stat-item">
+              <h3>150+</h3>
+              <p>
+                {translations.countriesCovered || aboutContent.countriesCovered}
+              </p>
+            </div>
+            <div className="stat-item">
+              <h3>99.8%</h3>
+              <p>
+                {translations.onTimeDelivery || aboutContent.onTimeDelivery}
+              </p>
+            </div>
+            <div className="stat-item">
+              <h3>24/7</h3>
+              <p>
+                {translations.customerSupport || aboutContent.customerSupport}
+              </p>
+            </div>
+          </div>
+
+          <div className="why-choose">
+            <h2>{translations.whyChoose || aboutContent.whyChoose}</h2>
+            <div className="features-list">
+              <div className="feature-item">
+                <Shield size={32} />
+                <div>
+                  <h4>
+                    {translations.secureInsured || aboutContent.secureInsured}
+                  </h4>
+                  <p>{translations.secureDesc || aboutContent.secureDesc}</p>
+                </div>
+              </div>
+              <div className="feature-item">
+                <Truck size={32} />
+                <div>
+                  <h4>
+                    {translations.fastDelivery || aboutContent.fastDelivery}
+                  </h4>
+                  <p>{translations.fastDesc || aboutContent.fastDesc}</p>
+                </div>
+              </div>
+              <div className="feature-item">
+                <Globe size={32} />
+                <div>
+                  <h4>
+                    {translations.globalNetwork || aboutContent.globalNetwork}
+                  </h4>
+                  <p>
+                    {translations.globalNetworkDesc ||
+                      aboutContent.globalNetworkDesc}
+                  </p>
+                </div>
+              </div>
+              <div className="feature-item">
+                <MapPin size={32} />
+                <div>
+                  <h4>
+                    {translations.realTimeTracking ||
+                      aboutContent.realTimeTracking}
+                  </h4>
+                  <p>
+                    {translations.realTimeDesc || aboutContent.realTimeDesc}
+                  </p>
+                </div>
               </div>
             </div>
-            <div className="feature-item">
-              <Truck size={32} />
-              <div>
-                <h4>Fast Delivery</h4>
-                <p>
-                  Express shipping options available with guaranteed delivery
-                  timelines
-                </p>
-              </div>
-            </div>
-            <div className="feature-item">
-              <Globe size={32} />
-              <div>
-                <h4>Global Network</h4>
-                <p>
-                  Extensive network spanning over 150 countries and territories
-                </p>
-              </div>
-            </div>
-            <div className="feature-item">
-              <MapPin size={32} />
-              <div>
-                <h4>Real-Time Tracking</h4>
-                <p>
-                  Advanced GPS tracking with live updates at every stage of
-                  delivery
-                </p>
-              </div>
-            </div>
           </div>
         </div>
-      </div>
-    </section>
-  </>
-);
+      </section>
+    </>
+  );
+};
 
 // Contact Page Component
-const ContactPage = () => {
+const ContactPage = ({ currentLanguage }) => {
+  const { translations, translateContent } = useTranslation(currentLanguage);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -598,6 +869,35 @@ const ContactPage = () => {
     message: "",
   });
   const [submitted, setSubmitted] = useState(false);
+
+  const contactContent = {
+    title: "Contact Us",
+    subtitle: "We're here to help. Get in touch with our team",
+    getInTouch: "Get In Touch",
+    contactDesc:
+      "Have questions about our services? Need help with tracking? Our customer support team is available 24/7 to assist you.",
+    phone: "Phone",
+    email: "Email",
+    office: "Office",
+    businessHours: "Business Hours",
+    mondayFriday: "Monday - Friday:",
+    saturday: "Saturday:",
+    sunday: "Sunday:",
+    emergencySupport: "* Emergency support available 24/7",
+    sendMessage: "Send Us a Message",
+    thankYou: "Thank you! Your message has been sent successfully.",
+    fullName: "Full Name *",
+    emailAddress: "Email Address *",
+    subject: "Subject *",
+    message: "Message *",
+    howCanWeHelp: "How can we help?",
+    tellUsMore: "Tell us more about your inquiry...",
+    sendMessageButton: "Send Message",
+  };
+
+  useEffect(() => {
+    translateContent(contactContent);
+  }, [currentLanguage]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -638,8 +938,8 @@ const ContactPage = () => {
     <>
       <section className="page-hero">
         <div className="container">
-          <h1>Contact Us</h1>
-          <p>We're here to help. Get in touch with our team</p>
+          <h1>{translations.title || contactContent.title}</h1>
+          <p>{translations.subtitle || contactContent.subtitle}</p>
         </div>
       </section>
 
@@ -647,11 +947,8 @@ const ContactPage = () => {
         <div className="container">
           <div className="contact-grid">
             <div className="contact-info">
-              <h2>Get In Touch</h2>
-              <p>
-                Have questions about our services? Need help with tracking? Our
-                customer support team is available 24/7 to assist you.
-              </p>
+              <h2>{translations.getInTouch || contactContent.getInTouch}</h2>
+              <p>{translations.contactDesc || contactContent.contactDesc}</p>
 
               <div className="contact-methods">
                 <div className="contact-method">
@@ -659,7 +956,7 @@ const ContactPage = () => {
                     <Phone size={24} />
                   </div>
                   <div>
-                    <h4>Phone</h4>
+                    <h4>{translations.phone || contactContent.phone}</h4>
                     <p>+233 (0) 24 123 4567</p>
                     <p>Mon-Sun: 24/7</p>
                   </div>
@@ -670,7 +967,7 @@ const ContactPage = () => {
                     <Mail size={24} />
                   </div>
                   <div>
-                    <h4>Email</h4>
+                    <h4>{translations.email || contactContent.email}</h4>
                     <p>support@shiptrack.com</p>
                     <p>info@shiptrack.com</p>
                   </div>
@@ -681,7 +978,7 @@ const ContactPage = () => {
                     <MapPinned size={24} />
                   </div>
                   <div>
-                    <h4>Office</h4>
+                    <h4>{translations.office || contactContent.office}</h4>
                     <p>123 Logistics Avenue</p>
                     <p>Accra, Ghana</p>
                   </div>
@@ -689,22 +986,29 @@ const ContactPage = () => {
               </div>
 
               <div className="business-hours">
-                <h3>Business Hours</h3>
+                <h3>
+                  {translations.businessHours || contactContent.businessHours}
+                </h3>
                 <div className="hours-list">
                   <div className="hours-item">
-                    <span>Monday - Friday:</span>
+                    <span>
+                      {translations.mondayFriday || contactContent.mondayFriday}
+                    </span>
                     <span>8:00 AM - 6:00 PM</span>
                   </div>
                   <div className="hours-item">
-                    <span>Saturday:</span>
+                    <span>
+                      {translations.saturday || contactContent.saturday}
+                    </span>
                     <span>9:00 AM - 4:00 PM</span>
                   </div>
                   <div className="hours-item">
-                    <span>Sunday:</span>
+                    <span>{translations.sunday || contactContent.sunday}</span>
                     <span>10:00 AM - 2:00 PM</span>
                   </div>
                   <div className="hours-note">
-                    * Emergency support available 24/7
+                    {translations.emergencySupport ||
+                      contactContent.emergencySupport}
                   </div>
                 </div>
               </div>
@@ -712,19 +1016,23 @@ const ContactPage = () => {
 
             <div className="contact-form-wrapper">
               <form className="contact-form" onSubmit={handleSubmit}>
-                <h3>Send Us a Message</h3>
+                <h3>
+                  {translations.sendMessage || contactContent.sendMessage}
+                </h3>
 
                 {submitted && (
                   <div className="success-message">
                     <CheckCircle size={20} />
                     <span>
-                      Thank you! Your message has been sent successfully.
+                      {translations.thankYou || contactContent.thankYou}
                     </span>
                   </div>
                 )}
 
                 <div className="form-group">
-                  <label htmlFor="name">Full Name *</label>
+                  <label htmlFor="name">
+                    {translations.fullName || contactContent.fullName}
+                  </label>
                   <input
                     type="text"
                     id="name"
@@ -737,7 +1045,9 @@ const ContactPage = () => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="email">Email Address *</label>
+                  <label htmlFor="email">
+                    {translations.emailAddress || contactContent.emailAddress}
+                  </label>
                   <input
                     type="email"
                     id="email"
@@ -750,7 +1060,9 @@ const ContactPage = () => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="subject">Subject *</label>
+                  <label htmlFor="subject">
+                    {translations.subject || contactContent.subject}
+                  </label>
                   <input
                     type="text"
                     id="subject"
@@ -758,12 +1070,16 @@ const ContactPage = () => {
                     value={formData.subject}
                     onChange={handleInputChange}
                     required
-                    placeholder="How can we help?"
+                    placeholder={
+                      translations.howCanWeHelp || contactContent.howCanWeHelp
+                    }
                   />
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="message">Message *</label>
+                  <label htmlFor="message">
+                    {translations.message || contactContent.message}
+                  </label>
                   <textarea
                     id="message"
                     name="message"
@@ -771,13 +1087,16 @@ const ContactPage = () => {
                     onChange={handleInputChange}
                     required
                     rows="6"
-                    placeholder="Tell us more about your inquiry..."
+                    placeholder={
+                      translations.tellUsMore || contactContent.tellUsMore
+                    }
                   ></textarea>
                 </div>
 
                 <button type="submit" className="btn-primary btn-large">
                   <Send size={20} />
-                  Send Message
+                  {translations.sendMessageButton ||
+                    contactContent.sendMessageButton}
                 </button>
               </form>
             </div>
@@ -789,42 +1108,76 @@ const ContactPage = () => {
 };
 
 // Footer Component
-const Footer = () => (
-  <footer className="footer">
-    <div className="container">
-      <div className="footer-content">
-        <div className="footer-column">
-          <h4>Company</h4>
-          <a href="#about">About</a>
-          <a href="#careers">Careers</a>
-          <a href="#terms">Terms</a>
-        </div>
-        <div className="footer-column">
-          <h4>Services</h4>
-          <a href="#shipping">Shipping</a>
-          <a href="#tracking">Tracking</a>
-          <a href="#rates">Rates</a>
-        </div>
-        <div className="footer-column">
-          <h4>Support</h4>
-          <a href="#contact">Contact</a>
-          <a href="#help">Help Center</a>
-        </div>
-        <div className="footer-column">
-          <h4>Follow Us</h4>
-          <div className="social-links">
-            <a href="#facebook">Facebook</a>
-            <a href="#linkedin">LinkedIn</a>
-            <a href="#twitter">Twitter</a>
+const Footer = ({ currentLanguage }) => {
+  const { translations, translateContent } = useTranslation(currentLanguage);
+
+  const footerContent = {
+    company: "Company",
+    about: "About",
+    careers: "Careers",
+    terms: "Terms",
+    services: "Services",
+    shipping: "Shipping",
+    tracking: "Tracking",
+    rates: "Rates",
+    support: "Support",
+    contact: "Contact",
+    helpCenter: "Help Center",
+    followUs: "Follow Us",
+    rights: "© 2025 CargoExpress Logistics. All rights reserved.",
+  };
+
+  useEffect(() => {
+    translateContent(footerContent);
+  }, [currentLanguage]);
+
+  return (
+    <footer className="footer">
+      <div className="container">
+        <div className="footer-content">
+          <div className="footer-column">
+            <h4>{translations.company || footerContent.company}</h4>
+            <a href="#about">{translations.about || footerContent.about}</a>
+            <a href="#careers">
+              {translations.careers || footerContent.careers}
+            </a>
+            <a href="#terms">{translations.terms || footerContent.terms}</a>
+          </div>
+          <div className="footer-column">
+            <h4>{translations.services || footerContent.services}</h4>
+            <a href="#shipping">
+              {translations.shipping || footerContent.shipping}
+            </a>
+            <a href="#tracking">
+              {translations.tracking || footerContent.tracking}
+            </a>
+            <a href="#rates">{translations.rates || footerContent.rates}</a>
+          </div>
+          <div className="footer-column">
+            <h4>{translations.support || footerContent.support}</h4>
+            <a href="#contact">
+              {translations.contact || footerContent.contact}
+            </a>
+            <a href="#help">
+              {translations.helpCenter || footerContent.helpCenter}
+            </a>
+          </div>
+          <div className="footer-column">
+            <h4>{translations.followUs || footerContent.followUs}</h4>
+            <div className="social-links">
+              <a href="#facebook">Facebook</a>
+              <a href="#linkedin">LinkedIn</a>
+              <a href="#twitter">Twitter</a>
+            </div>
           </div>
         </div>
+        <div className="footer-bottom">
+          <p>{translations.rights || footerContent.rights}</p>
+        </div>
       </div>
-      <div className="footer-bottom">
-        <p>© 2025 CargoExpress Logistics. All rights reserved.</p>
-      </div>
-    </div>
-  </footer>
-);
+    </footer>
+  );
+};
 
 // Main App Component
 const App = () => {
@@ -832,18 +1185,7 @@ const App = () => {
   const [trackingNumber, setTrackingNumber] = useState("");
   const [shipmentData, setShipmentData] = useState(null);
   const [error, setError] = useState(null);
-
-  // const handleTrack = () => {
-  //   const trimmedNumber = trackingNumber.trim().toUpperCase();
-  //   if (trimmedNumber) {
-  //     const shipment = SAMPLE_SHIPMENTS[trimmedNumber];
-  //     if (shipment) {
-  //       setShipmentData(shipment);
-  //     } else {
-  //       setShipmentData({ error: "Tracking number not found" });
-  //     }
-  //   }
-  // };
+  const [currentLanguage, setCurrentLanguage] = useState("en");
 
   const handleTrack = async () => {
     setShipmentData(null);
@@ -958,6 +1300,31 @@ const App = () => {
 
         .nav-links a:hover::after {
           width: 100%;
+        }
+
+        .nav-actions {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .language-selector {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.5rem;
+          border-radius: 6px;
+          border: 1px solid #E2E8F0;
+          background: white;
+        }
+
+        .language-dropdown {
+          border: none;
+          background: transparent;
+          color: #0F172A;
+          font-size: 0.875rem;
+          cursor: pointer;
+          outline: none;
         }
 
         .btn-primary {
@@ -1736,6 +2103,11 @@ const App = () => {
             display: none;
           }
 
+          .nav-actions {
+            flex-direction: column;
+            gap: 0.5rem;
+          }
+
           .hero-content {
             grid-template-columns: 1fr;
             text-align: center;
@@ -1800,10 +2172,15 @@ const App = () => {
         setCurrentPage={setCurrentPage}
         onNavigate={handleNavigate}
         onTrackClick={handleTrackClick}
+        currentLanguage={currentLanguage}
+        onLanguageChange={setCurrentLanguage}
       />
 
       {currentPage === "landing" && (
-        <LandingPage onTrackClick={handleTrackClick} />
+        <LandingPage
+          onTrackClick={handleTrackClick}
+          currentLanguage={currentLanguage}
+        />
       )}
       {currentPage === "tracking" && (
         <TrackingPage
@@ -1814,12 +2191,17 @@ const App = () => {
           error={error}
           setError={setError}
           setShipmentData={setShipmentData}
+          currentLanguage={currentLanguage}
         />
       )}
-      {currentPage === "about" && <AboutPage />}
-      {currentPage === "contact" && <ContactPage />}
+      {currentPage === "about" && (
+        <AboutPage currentLanguage={currentLanguage} />
+      )}
+      {currentPage === "contact" && (
+        <ContactPage currentLanguage={currentLanguage} />
+      )}
 
-      <Footer />
+      <Footer currentLanguage={currentLanguage} />
     </div>
   );
 };
