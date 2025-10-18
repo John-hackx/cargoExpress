@@ -807,6 +807,8 @@ const TrackingPage = ({
                       <p>{event.location}</p>
                       <span className="timeline-time">{event.time}</span>
                     </div>
+                    {event.status === "In-transit" && <span>🟠</span>}
+                    {event.status === "Delivered" && <span>🟢</span>}
                   </div>
                 ))}
               </div>
@@ -1168,12 +1170,15 @@ const App = () => {
   const handleTrack = async () => {
     setShipmentData(null);
     setError(null);
+    const response = await fetch(
+      `${API_URL}/shipments/track/${trackingNumber}`
+    );
+    const result = await response.json();
 
-    // Use sample data for demonstration
-    if (trackingNumber.trim().toUpperCase() === "ST123456789") {
-      setShipmentData(SAMPLE_SHIPMENTS.ST123456789);
+    if (result.success) {
+      setShipmentData(result.data);
     } else {
-      setError("Tracking number not found");
+      setError(result.error);
     }
   };
 

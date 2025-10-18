@@ -62,7 +62,7 @@ export const sampleShipments = [
         description: "Package loaded on delivery vehicle",
       },
       {
-        status: "Arrived at Local Hub",
+        status: "In-transit",
         location: "London, UK",
         time: new Date("2025-10-19T18:20:00"),
         icon: "package",
