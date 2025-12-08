@@ -23,13 +23,13 @@ export const sampleShipments = [
       coordinates: { lat: 5.6037, lng: -0.187 },
     },
     sender: {
-      name: "Sarah Quaye",
-      email: "quayesarah75@gmail.com",
+      name: "Vera Asiedu",
+      email: "veraasiedu960@gmail.com",
       phone: "+233-596-881-057",
     },
     recipient: {
-      name: "Antonio Bonicore",
-      email: "antoniobonicore@gmail.com",
+      name: "Giuseppe ghetti",
+      email: "Giuseppe.ghetti56@gmail.com",
       phone: "+39-329-6358-722",
     },
     packageDetails: {
