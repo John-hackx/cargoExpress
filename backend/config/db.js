@@ -1,8 +1,11 @@
 import mongoose from "mongoose";
+import dotenv from "dotenv";
 import { sampleShipments } from "../seedData.js";
 import shipmentModel from "../models/shipmentModel.js";
 
 // Automatically seed if database is empty
+
+dotenv.config();
 
 // Add to server.js
 const checkAndSeed = async () => {
