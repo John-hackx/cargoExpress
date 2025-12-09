@@ -25,7 +25,7 @@ export const sampleShipments = [
     sender: {
       name: "Vera Asiedu",
       email: "veraasiedu960@gmail.com",
-      phone: "+233-596-881-057",
+      phone: "+233-55-515-7547",
     },
     recipient: {
       name: "Giuseppe ghetti",
