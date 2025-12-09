@@ -17,19 +17,19 @@ export const sampleShipments = [
       weight: 20,
     },
     destination: {
-      address: "85100 Potenza (Italia)",
+      address: "Via Amendola 2 Comazzo 26833",
       city: "Lodi",
       country: "Italy",
       coordinates: { lat: 5.6037, lng: -0.187 },
     },
     sender: {
-      name: "Vera Asiedu",
-      email: "veraasiedu960@gmail.com",
-      phone: "+233-55-515-7547",
+      name: "Daniel Owusu",
+      email: "danielowusu30960@gmail.com",
+      phone: "+233555157547",
     },
     recipient: {
       name: "Giuseppe ghetti",
-      email: "Giuseppe.ghetti56@gmail.com",
+      email: "giuseppe.ghetti56@gmail.com",
       phone: "+39-348-744-0073",
     },
     packageDetails: {
