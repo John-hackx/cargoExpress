@@ -48,14 +48,14 @@ export const sampleShipments = [
     },
     timeline: [
       {
-        status: "In-transit",
+        status: "Delivered",
         location: "Accra, Ghana",
         time: new Date("2025-12-10T15:45:00"),
         icon: "check",
         description: "Package delivered and signed by recipient",
       },
       {
-        status: "In-transit",
+        status: "Delivered",
         location: "Tema, Ghana",
         time: new Date("2025-12-14T10:00:00"),
         icon: "check",
