@@ -13,7 +13,7 @@ export const sampleShipments = [
     },
     productDetails: {
       name: "Gold Bars",
-      quantity: 4,
+      quantity: 10,
       weight: 20,
     },
     destination: {
