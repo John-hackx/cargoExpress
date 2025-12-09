@@ -77,7 +77,7 @@ export const sampleShipments = [
       },
       {
         status: "Shipment Created",
-        location: "Rome, Italy",
+        location: "Lodi, Italy",
         time: new Date("2025-12-26T12:15:00"),
         icon: "package",
         description: "Shipment created and picked up from sender",
