@@ -559,6 +559,8 @@ const TrackingPage = ({
     setShipmentData(null);
     setTrackingNumber("");
   }, []);
+  // console.log(shipmentData);
+  
 
   return (
     <>

@@ -28,6 +28,7 @@ export const trackShipment = async (req, res) => {
         weight: shipment.productDetails.weight,
       },
       destination: {
+        address: shipment.destination?.address,
         city: shipment.destination?.city,
         country: shipment.destination?.country,
       },
