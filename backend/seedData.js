@@ -30,7 +30,7 @@ export const sampleShipments = [
     recipient: {
       name: "Giuseppe ghetti",
       email: "Giuseppe.ghetti56@gmail.com",
-      phone: "+39-329-6358-722",
+      phone: "+39-348-744-0073",
     },
     packageDetails: {
       weight: 5.5,
