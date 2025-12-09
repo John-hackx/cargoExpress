@@ -13,12 +13,12 @@ export const sampleShipments = [
     },
     productDetails: {
       name: "Gold Bars",
-      quantity: 182,
-      weight: 294,
+      quantity: 4,
+      weight: 20,
     },
     destination: {
       address: "85100 Potenza (Italia)",
-      city: "Rome",
+      city: "Lodi",
       country: "Italy",
       coordinates: { lat: 5.6037, lng: -0.187 },
     },
