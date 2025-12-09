@@ -793,13 +793,13 @@ const TrackingPage = ({
                     </div>
                     <div className="timeline-content">
                       <h4>
-                        {event.status === "delivered" &&
+                        {event.status === "Delivered" &&
                           getTranslation("delivered")}
                         {event.status === "out_for_delivery" &&
                           getTranslation("outForDelivery")}
                         {event.status === "arrived_hub" &&
                           getTranslation("arrivedHub")}
-                        {event.status === "in_transit" &&
+                        {event.status === "In-transit" &&
                           getTranslation("inTransit")}
                         {event.status === "created" &&
                           getTranslation("shipmentCreated")}
