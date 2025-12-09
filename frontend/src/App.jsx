@@ -725,6 +725,14 @@ const TrackingPage = ({
                       {shipmentData.recipient?.phone || "+233 24 123 4567"}
                     </span>
                   </div>
+                  <div className="detail-item">
+                    <span className="detail-label">
+                      {getTranslation("Address")}
+                    </span>
+                    <span className="detail-value">
+                      {shipmentData.destination?.address}
+                    </span>
+                  </div>
                 </div>
               </div>
 
