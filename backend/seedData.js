@@ -39,8 +39,8 @@ export const sampleShipments = [
       value: 1200,
     },
     serviceType: "express",
-    estimatedDelivery: new Date("2025-10-22"),
-    actualDelivery: new Date("2025-10-22T15:45:00"),
+    estimatedDelivery: new Date("2025-12-26"),
+    actualDelivery: new Date("2025-12-26T15:45:00"),
     currentLocation: {
       city: "Accra",
       country: "Ghana",
